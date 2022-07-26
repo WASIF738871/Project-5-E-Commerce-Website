@@ -3,9 +3,9 @@ const {isValidObjectId} = require('mongoose')
 const aws1 = require("../aws/aws.js")
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-let{isValidRequestBody,isValid,isValidEmail,isvalidPincode} = require("../validator/validation")
+let{isValidRequestBody,isValid,isValidEmail,isvalidPincode,isValidPassword,isValidPhone} = require("../validator/validation")
 
-//************************************************ Creating User  *****************************************************/
+//************************************************ Creating User  ********************************************/
 
 const createUser = async (req,res) =>{
     try{
@@ -16,7 +16,7 @@ const createUser = async (req,res) =>{
         if(!isValidRequestBody(data)){
             return res.status(400).send({status:false,msg:"Provide the data of User "})
         }  
-//Validating Names
+               //Validating Names
         if(!isValid(fname)){
             return res.status(400).send({status:false,msg:"Provide the First Name "})
         }
@@ -30,13 +30,8 @@ const createUser = async (req,res) =>{
         if (!(/^[a-zA-Z ]{2,30}$/.test(lname))) {
           return res.status(400).send({ status: false, msg: "Enter valid  lname" }) }
 
-
-
-        if(!isValid(phone)){
-            return res.status(400).send({status:false,msg:"Provide the Phone Number "})
-        }
-        if (!(/^[0-9]{10}$/.test(phone))) {
-            return res.status(400).send({ status: false, msg: " phone number should have 10 digits only" });
+          if (!isValid(phone) || !isValidPhone(phone)) {
+            return res.status(400).send({ status: false, message: "phone is required and it should be a valid indian phone number" });
         }
         let PhoneCheck = await userModel.findOne({ phone: phone.trim() })
         if (PhoneCheck) { return res.status(400).send({ status: false, msg: "this phone is already present" }) }
@@ -55,9 +50,10 @@ const createUser = async (req,res) =>{
         if(!isValid(password)){
             return res.status(400).send({status:false,msg:"Provide the Password "})
         }
-        if (typeof password !== "string" || password.trim().length === 0) { return res.status(400).send({ status: false, msg: "enter valid password" }) };
-        if(password.length<8 && password.length>15){return res.status(400).send({status:false,msg:"Password Length must be btwn 8-15 chars only"})}
-       
+        if (!isValidPassword(password)){
+            return res.status(400).send({status:false,msg:"Password Length must be btwn 8-15 chars only"})
+        }
+        
         const  saltRounds = 10;
         const encryptedPassword = await bcrypt.hash(password, saltRounds)
         data['password'] = encryptedPassword
@@ -120,38 +116,39 @@ const loginUser = async function(req,res){
 
         const data = req.body
         const {email,password} = data
-        if(Object.keys(data).length==0){
-            return res.status(400).send({status:false,msg:"Please Enter email and Password"})
+        if (!isValidRequestBody(data)) {
+            return res.status(400).send({ status: false, message: "Please enter login credentials" });
+        }
+
+        if (!isValid(email) || !isValidEmail(email)) {
+            return res.status(400).send({ status: false, message: "Email is requird and it should be a valid email address" });
+        }
+        if (!isValid(password) || !isValidPassword(password)) {
+            return res.status(400).send({ status: false, message: "Password  should be Valid min 8 and max 15 length" });
+        }
+        const user = await userModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).send({status:false,msg:"Invalid User"})
 
         }
-        if(!email){
-            return res.status(400).send({status:false,msg:"Please Enter email"})
+        const decrypPassword = user.password
+        const pass = await bcrypt.compare(password, decrypPassword)
+        if (!pass) {
+            return res.status(400).send({ status: false, message: "Password Incorrect" })
         }
-        if(!password){
-            return res.status(400).send({status:false,msg:"Please Enter password"})
-        }
-        const hash = await userModel.findOne({email:email}).select({_id:1,password:1})
-        if(hash){
-        const existUser =  bcrypt.compare(password, hash.password) 
-        if(!existUser){
-            return res.status(404).send({status:false,msg:"Invalid User"})
-        }}
-        else{
-            return res.status(404).send({status:false,msg:"No user With this email"})
-        }
+       
        
 
 // Creating Token Here
 
-        const token =  jwt.sign({ userId:hash._id },
-                                    'MbFastChe-36', 
-                                { expiresIn: "24h" })
+        const token =  jwt.sign({ userId:user._id }, 'MbFastChe-36', { expiresIn: "24h" })
 
-        res.setHeader("x-api-key",token)
         let obj = {
-            userId:hash._id,
+            userId:user._id,
             token:token
         }
+        res.setHeader('Authorization', 'Bearer ' + token);
+
         return res.status(201).send({status:true,msg:"User LoggedIn Succesfully",data:obj})
 
     }
@@ -184,4 +181,41 @@ const getUser = async(req,res)=>{
     }
 
 }
+
+//----------------------------------------updateUser----------------------------------------
+const updateUserProfile = async function (req,res) {
+    try{
+        const userId= req.params.userId;
+        const data= req.body
+        const file = req.files
+        if(!isValidObjectId(userId)){
+            return res.status(400).send({stauts:false,msg:"Invalid User Id"})
+        }
+        const isUserPresent =await userModel.findById(userId)
+        if(!isUserPresent){
+            return res.status(404).send({status:false,msg:"No User Found"})
+        }
+        if (userId != req.userId) {
+            return res.status(403).send({ status: false, message: "unauthorized access!" });
+        }
+        if (!isValidRequestBody(data)) {
+            return res.status(400).send({ status: false, message: "Please provide data for update" });
+        }
+        let{fname,lname,phone,email,password,address,profileImage} = data
+
+        if(file && file.length>0){
+            let  url = await aws1.uploadFile( file[0] )
+            data['profileImage'] = url
+        }
+
+
+
+
+    }catch(err){
+        return res.status(500).send({status:false,msg:err.message})
+
+    }
+}
+
+
 module.exports = {createUser,loginUser,getUser}

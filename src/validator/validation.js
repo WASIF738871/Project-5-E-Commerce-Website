@@ -21,6 +21,16 @@ const isValidEmail = function (email) {
     return pattern.test(email); // returns a boolean
 };
 const isvalidPincode = (value) => ({}.toString.call(value) == '[object Number]') ? true : false //{}.toString.call(value) == '[object Number]'
+const isValidPassword = function (password) {
+    if (password.length >= 8 && password.length <= 15) {
+        return true;
+    }
+    return false;
+};
+const isValidPhone = function (phone) {
+    const pattern = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/;
+    return pattern.test(phone); // returns a boolean
+};
 
 
-module.exports = {isValidRequestBody,isValidEmail,isValid,isvalidPincode}
+module.exports = {isValidRequestBody,isValidEmail,isValid,isvalidPincode,isValidPassword,isValidPhone}
