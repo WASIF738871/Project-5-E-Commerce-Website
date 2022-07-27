@@ -314,7 +314,7 @@ const updateUserProfile = async function (req,res) {
               return res.status(400).send({ status: false, msg: "Password Length must be btwn 8-15 chars only" })
           }
                // if old password is same as new password
-            const isSamePassword = await bcrypt.compare(password, isUserPresent.password);
+            const isSamePassword = bcrypt.compare(password, isUserPresent.password);
             if (isSamePassword) {
                 return res.status(400).send({ status: false, message: "entered password is same as old password" })
             }
@@ -327,33 +327,52 @@ const updateUserProfile = async function (req,res) {
           if (address) {
               let objAddress = JSON.parse(address)
               if (objAddress.shipping) {
-
-                  if (!isValid(objAddress.shipping.street)) {
-                      return res.status(400).send({ status: false, Message: "Please provide street name in shipping address" })
-                  }
-                  
-                  if (!isValid(objAddress.shipping.city))
-                      return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
-                      if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
-                        return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
-                      }
-                  if (!isvalidPincode(objAddress.shipping.pincode))
-                      return res.status(400).send({ status: false, Message: "Please provide pincode in shipping address" })
-                   }    
+                    if(objAddress.shipping.street){
+                        if (!isValid(objAddress.shipping.street)) {
+                            return res.status(400).send({ status: false, Message: "Please provide street name in shipping address" })
+                        }
+                    } 
+                    
+                    if(objAddress.shipping.city){
+                        if (!isValid(objAddress.shipping.city)){
+                            return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
+                        }
+                        if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
+                                return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                        }
+                    }   
+                    
+                    if(objAddress.shipping.pincode){
+                        if (!isvalidPincode(objAddress.shipping.pincode)){
+                            return res.status(400).send({ status: false, Message: "Please provide pincode in shipping address" })
+                        }
+                    }  
+                }       
                 
              
-              if (objAddress.billing) {
-                  if (!isValid(objAddress.billing.street))
-                      return res.status(400).send({ status: false, Message: "Please provide street name in billing address" })
-                      
-                  if (!isValid(objAddress.billing.city))
-                      return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
-                      if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
+            if (objAddress.billing) {
+
+                if(objAddress.billing.street){
+                    if (!isValid(objAddress.billing.street)){
+                        return res.status(400).send({ status: false, Message: "Please provide street name in billing address" })
+                    }
+                }      
+
+                if(objAddress.billing.city){
+                    if (!isValid(objAddress.billing.city)){
+                        return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
+                    }
+                    if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
                         return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
-                      }
-                  if (!isvalidPincode(objAddress.billing.pincode))
-                      return res.status(400).send({ status: false, Message: "Please provide pincode in billing address" })
-              }
+                    }
+                }   
+                
+                if(objAddress.billing.pincode){
+                    if (!isvalidPincode(objAddress.billing.pincode)){
+                        return res.status(400).send({ status: false, Message: "Please provide pincode in billing address" })
+                    }
+               }
+            }
               
               var updateaddress = objAddress
           } else {
