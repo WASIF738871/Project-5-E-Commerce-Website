@@ -84,6 +84,31 @@ const createProducts = async (req, res) => {
 const getProductByFilter = async function (req, res) {
 
     try {
+        let filter = req.body
+        let{size,name,priceGreaterThan,priceLessThan} = filter
+        let data = {isDeleted:false}
+        if(filter.size){
+            data['availableSizes'] = size.toUpperCase()
+        }
+        if(filter.name){
+            data['title'] = name
+        }
+        
+        if(priceGreaterThan){
+            data['price']= {$gte:priceGreaterThan}
+        }
+        if(priceLessThan){
+            data['price'] = {$lte:priceLessThan}
+        }
+        if(priceGreaterThan && priceLessThan){
+            data['price'] = {$gte:priceGreaterThan,$lte:priceLessThan}
+        }
+
+        const getData = await productModel.find(data).sort({price:1} )
+        if(getData.length==0){
+            return res.status(404).send({status:false,msg:"No Data Found With These Filters"})
+            }
+        return res.status(200).send({status:true,data:getData})
    
     }catch (err) {
         res.status(500).send({ status: false, msg: err.message })   

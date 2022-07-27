@@ -8,8 +8,9 @@ router.post("/register",userController.createUser)
 router.post("/login",userController.loginUser)
 router.get("/user/:userId/profile",middleware.authentication,userController.getUser)
 router.put("/user/:userId/profile", middleware.authentication, userController.updateUserProfile);
-router.post("/products",productController.createProducts)
 
+router.post("/products",productController.createProducts)
+router.get("/products",productController.getProductByFilter)
 //Product Api's
 router.get("/products/:productId",productController.getProductById)
 
