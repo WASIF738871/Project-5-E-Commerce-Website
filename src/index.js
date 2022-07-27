@@ -13,9 +13,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 
 mongoose.connect("mongodb+srv://WASIF321:Ansari738871@wasifdatabase.wdcjr.mongodb.net/group36Database",
-    { useNewUrlParser: true })
-    .then(() => console.log("MongoDb is connected"))
-    .catch((err) => console.log(err));
+    { useNewUrlParser: true }).then(() => console.log("MongoDb is connected")).catch((err) => console.log(err));
 
 app.use("/", route);
 

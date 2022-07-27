@@ -117,7 +117,7 @@ const getProductByFilter = async function (req, res) {
 
 //======================================================getProductById==================================================================================
 const getProductById = async function (req, res) {
-    try {
+    // try {
         const productId = req.params.productId;
 
         if (!isValidObjectId(productId)) {
@@ -128,11 +128,28 @@ const getProductById = async function (req, res) {
             return res.status(404).send({ status: false, message: "No such product exists" })
         }
         res.status(200).send({ status: true, message: 'Success', data: productDetails })
+    // }catch (err) {
+    //     res.status(500).send({ status: false, msg: err.message })   
+    // }
+}
+//==========================================================================================
+const deleteProductById = async function (req, res) {
+    try {
+        const productId = req.params.productId;
+        if (!isValidObjectId(productId)) {
+            return res.status(400).send({ status: false, message: "Inavlid productId." })
+        }
+        const findProduct = await productModel.findById(productId);
+        if (!findProduct) {
+            return res.status(404).send({ status: false, message: `No book found by ${productId}` })
+        }
+        if (findProduct.isDeleted == true) {
+            return res.status(400).send({ status: false, message: `Product has been already deleted.` })
+        }
+        const deletedProduct = await productModel.findOneAndUpdate({ _id: productId }, { $set: { isDeleted: true, deletedAt: new Date() } }, { new: true }).select({ _id: 1, title: 1, isDeleted: 1, deletedAt: 1 })
+        res.status(200).send({ status: true, message: "Product deleted successfullly.", data: deletedProduct })
     }catch (err) {
         res.status(500).send({ status: false, msg: err.message })   
     }
 }
-module.exports = {
-    createProducts,getProductByFilter,getProductById
-}
-
+module.exports = { createProducts, getProductById, deleteProductById, getProductByFilter }
