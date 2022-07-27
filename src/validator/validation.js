@@ -31,6 +31,11 @@ const isValidPhone = function (phone) {
     const pattern = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/;
     return pattern.test(phone); // returns a boolean
 };
-
-
-module.exports = {isValidRequestBody,isValidEmail,isValid,isvalidPincode,isValidPassword,isValidPhone}
+const isValidObjectId = function (objectId) {
+    return mongoose.Types.ObjectId.isValid(objectId); // returns a boolean
+};
+const isValidstring = function (value) {
+    const pattern = /^[a-zA-Z,'.\-\s]*$/;
+    return pattern.test(value);
+};
+module.exports = {isValidRequestBody,isValidEmail,isValid,isvalidPincode,isValidPassword,isValidPhone,isValidObjectId,isValidstring}

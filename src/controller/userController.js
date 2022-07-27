@@ -10,6 +10,7 @@ let {
   isvalidPincode,
   isValidPassword,
   isValidPhone,
+  isValidstring
 } = require("../validator/validation");
 
 //************************************************ Creating User  ********************************************/
@@ -273,7 +274,7 @@ const updateUserProfile = async function (req,res) {
             const bodyFromReq = JSON.parse(JSON.stringify(req.body));
       //validation part
       if (bodyFromReq.hasOwnProperty("fname")) {
-          if (!isValid(fname)) {
+          if (!isValid(fname) ) {
               return res.status(400).send({ status: false, msg: "Provide the First Name " })
           }
           if (!(/^[a-zA-Z ]{2,30}$/.test(fname))) {
@@ -319,8 +320,7 @@ const updateUserProfile = async function (req,res) {
             }
           const saltRounds = 10;
           const encryptedPassword = await bcrypt.hash(password, saltRounds)
-          console.log(encryptedPassword,"----");
-          // data["password"] = encryptedPassword
+       
           var hashpassword=encryptedPassword
        }
        if (bodyFromReq.hasOwnProperty('address')) {
@@ -329,32 +329,33 @@ const updateUserProfile = async function (req,res) {
               if (objAddress.shipping) {
 
                   if (!isValid(objAddress.shipping.street)) {
-
                       return res.status(400).send({ status: false, Message: "Please provide street name in shipping address" })
                   }
+                  
                   if (!isValid(objAddress.shipping.city))
                       return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
-
+                      if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
+                        return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                      }
                   if (!isvalidPincode(objAddress.shipping.pincode))
                       return res.status(400).send({ status: false, Message: "Please provide pincode in shipping address" })
-              }
-              else {
-                  res.status(400).send({ status: false, Message: "Please provide shipping address and it should be present in object with all mandatory fields" })
-              }
+                   }    
+                
+             
               if (objAddress.billing) {
                   if (!isValid(objAddress.billing.street))
                       return res.status(400).send({ status: false, Message: "Please provide street name in billing address" })
-
+                      
                   if (!isValid(objAddress.billing.city))
                       return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
-
+                      if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
+                        return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                      }
                   if (!isvalidPincode(objAddress.billing.pincode))
                       return res.status(400).send({ status: false, Message: "Please provide pincode in billing address" })
               }
-              else {
-                  return res.status(400).send({ status: false, Message: "Please provide billing address and it should be present in object with all mandatory fields" })
-              }
-              data['address'] = objAddress
+              
+              var updateaddress = objAddress
           } else {
               return res.status(400).send({ status: true, msg: "Please Provide The Address" })
           }
@@ -369,7 +370,7 @@ const updateUserProfile = async function (req,res) {
       }
 
       //updation part
-          const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { fname: fname, lname: lname, email: email, password: hashpassword, address: address, profileImage: profileImage,phone:phone } }, { new: true })
+          const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { fname: fname, lname: lname, email: email, password: hashpassword, address: updateaddress, profileImage: profileImage,phone:phone } }, { new: true })
           return res.status(200).send({status: true, "message": "User profile updated",data:updateUser})
 
 
