@@ -12,10 +12,8 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 
 
-mongoose.connect("mongodb+srv://WASIF321:Ansari738871@wasifdatabase.wdcjr.mongodb.net/group36Database",
-    { useNewUrlParser: true })
-    .then(() => console.log("MongoDb is connected"))
-    .catch((err) => console.log(err));
+mongoose.connect("mongodb+srv://chetan-chetanya-ankita-arjun:cXZH7N7BXqICICPb@cluster0.vcmws9j.mongodb.net/?retryWrites=true&w=majority",
+    { useNewUrlParser: true }).then(() => console.log("MongoDb is connected")).catch((err) => console.log(err));
 
 app.use("/", route);
 

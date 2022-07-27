@@ -8,13 +8,16 @@ router.post("/register",userController.createUser)
 router.post("/login",userController.loginUser)
 router.get("/user/:userId/profile",middleware.authentication,userController.getUser)
 router.put("/user/:userId/profile", middleware.authentication, userController.updateUserProfile);
-router.post("/products",productController.createProducts)
 
 //Product Api's
+router.post("/products",productController.createProducts)
+
 router.get("/products/:productId",productController.getProductById)
+router.get("/products",productController.getProductByFilter)
 
+router.delete("/products/:productId",productController.deleteProductById)
 
-router.all("/****",function(req,res){                                                   //Doubtfulllllllll
+router.all("/****",function(req,res){                                                   
     return res.status(404).send({status:false,msg:"Check whether the Endpoint is Correct or Not"})
 })
 
