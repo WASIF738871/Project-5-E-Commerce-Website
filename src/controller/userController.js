@@ -196,7 +196,7 @@ const loginUser = async function (req, res) {
       return res.status(404).send({ status: false, msg: "Invalid User" });
     }
     const decrypPassword = user.password;
-    const pass = await bcrypt.compare(password, decrypPassword);
+    const pass = bcrypt.compare(password, decrypPassword);
     if (!pass) {
       return res
         .status(400)
