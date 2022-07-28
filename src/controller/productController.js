@@ -108,8 +108,8 @@ const getProductByFilter = async function (req, res) {
         let filter = req.body
         let{size,name,priceGreaterThan,priceLessThan} = filter
         let data = {isDeleted:false}
-        size = size.replace(/\s+/g, "").toUpperCase().split(",").map(String)
         if(filter.size!=null){
+            size = size.replace(/\s+/g, "").toUpperCase().split(",").map(String)
             if(isValid(name)){return res.status(400).send({status:false, msg:"Please Enter Size Value "})}
             data['availableSizes'] ={$in:size}
         }
@@ -117,7 +117,7 @@ const getProductByFilter = async function (req, res) {
             data['title'] = name
         }
         
-        if(priceGreaterThan!=null){
+        if(priceGreaterThan!=null&& TypeOf(priceGreaterThan)==number){
             data['price']= {$gte:priceGreaterThan}
         }
 
@@ -271,7 +271,6 @@ const updateProduct= async function(req,res){
             })
             for (const element of subtrim) {
 
-                console.log(availableSizes)
                 if (Size.includes(element) === false) return res.status(400).send({ status: false, msg: 'Sizes should be in ["S", "XS", "M", "X", "L", "XXL", "XL"]' })
 
             }
