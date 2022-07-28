@@ -119,10 +119,19 @@ const getProductByFilter = async function (req, res) {
         }
         
         if(priceGreaterThan!=null){
+            if (!/^[0-9]*$/.test(priceGreaterThan)) {
+                return res.status(400).send({ status: false, message: "price should be in numbers" });
+            }
             data['price']= {$gte:priceGreaterThan}
         }
 
         if(priceLessThan!=null){
+            if (!/^[0-9]*$/.test(priceLessThan)) {
+                return res.status(400).send({ status: false, message: "price should be in numbers" });
+            }
+            if (priceLessThan <= 0) {
+                return res.status(400).send({ status: false, msg: "Price can't be zero" })
+            }
             data['price'] = {$lte:priceLessThan}
         }
 
@@ -143,7 +152,7 @@ const getProductByFilter = async function (req, res) {
 
 //======================================================getProductById==================================================================================
 const getProductById = async function (req, res) {
-    // try {
+    try {
         const productId = req.params.productId;
 
         if (!isValidObjectId(productId)) {
@@ -154,9 +163,9 @@ const getProductById = async function (req, res) {
             return res.status(404).send({ status: false, message: "No such product exists" })
         }
         res.status(200).send({ status: true, message: 'Success', data: productDetails })
-    // }catch (err) {
-    //     res.status(500).send({ status: false, msg: err.message })   
-    // }
+    }catch (err) {
+        res.status(500).send({ status: false, msg: err.message })   
+    }
 }
 
 //***********************************************Update Product Detatils*********************************************** */
