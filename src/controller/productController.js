@@ -285,7 +285,7 @@ const updateProduct= async function(req,res){
             newObj['productImage'] = uploadedFileURL
         }
         //updation part
-        const updateProduct = await productModel.findByIdAndUpdate({ _id: productId }, { newObj,$push:{availableSizes:availableSizes} }, { new: true })
+        const updateProduct = await productModel.findByIdAndUpdate({ _id: productId }, { $set:newObj,$push:{availableSizes:availableSizes} }, { new: true })
         return res.status(200).send({ status: true, "message": "Product updated", data: updateProduct })
         
     } catch (err) {
