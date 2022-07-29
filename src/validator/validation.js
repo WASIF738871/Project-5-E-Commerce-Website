@@ -34,8 +34,12 @@ const isValidPhone = function (phone) {
 const isValidObjectId = function (objectId) {
     return mongoose.Types.ObjectId.isValid(objectId); // returns a boolean
 };
-const isValidstring = function (value) {
-    const pattern = /^[a-zA-Z,'.\-\s]*$/;
-    return pattern.test(value);
-};
-module.exports = {isValidRequestBody,isValidEmail,isValid,isvalidPincode,isValidPassword,isValidPhone,isValidObjectId,isValidstring}
+
+const isValidImg = (img) => {
+    const reg = /image\/png|image\/jpeg|image\/jpg/;
+    return reg.test(img)
+}
+
+
+
+module.exports = { isValidRequestBody, isValidEmail, isValid, isvalidPincode, isValidPassword, isValidPhone, isValidObjectId, isValidstring,isValidImg }

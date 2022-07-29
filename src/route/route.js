@@ -13,8 +13,8 @@ router.put("/user/:userId/profile", middleware.authentication, userController.up
 //Product Api's
 router.post("/products",productController.createProducts)
 
-router.get("/products/:productId",productController.getProductById)
 router.get("/products",productController.getProductByFilter)
+router.get("/products/:productId",productController.getProductById)
 
 router.put("/products/:productId", productController.updateProduct)
 
