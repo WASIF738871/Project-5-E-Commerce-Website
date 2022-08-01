@@ -271,11 +271,11 @@ Send [form-data](https://developer.mozilla.org/en-US/docs/Web/API/FormData)
 - Create a cart for the user if it does not exist. Else add product(s) in cart.
 - Get cart id in request body.
 - Get productId in request body.
-- Make sure that cart exist.
+- Make sure that cart exist.--
 - Add a product(s) for a user in the cart.
-- Make sure the userId in params and in JWT token match.
-- Make sure the user exist
-- Make sure the product(s) are valid and not deleted.
+- Make sure the userId in params and in JWT token match.--
+- Make sure the user exist--
+- Make sure the product(s) are valid and not deleted.--
 - Get product(s) details in response body.
 - __Response format__
   - _**On success**_ - Return HTTP status 201. Also return the cart document. The response should be a JSON object like [this](#successful-response-structure)

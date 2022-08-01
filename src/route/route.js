@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router();
 const userController = require("../controller/userController")
 const productController = require("../controller/productController")
+const cartController = require("../controller/cartController")
 const middleware = require("../middleware/middleware")
 
 router.post("/register",userController.createUser)
@@ -13,12 +14,16 @@ router.put("/user/:userId/profile", middleware.authentication, userController.up
 //Product Api's
 router.post("/products",productController.createProducts)
 
-router.get("/products/:productId",productController.getProductById)
 router.get("/products",productController.getProductByFilter)
+router.get("/products/:productId",productController.getProductById)
 
 router.put("/products/:productId", productController.updateProduct)
 
 router.delete("/products/:productId",productController.deleteProductById)
+
+//cart Apis
+
+router.post("/users/:userId/cart",cartController.addCart)
 
 router.all("/****",function(req,res){                                                   
     return res.status(404).send({status:false,msg:"Check whether the Endpoint is Correct or Not"})

@@ -10,7 +10,7 @@ let {
   isvalidPincode,
   isValidPassword,
   isValidPhone,
-  isValidstring
+  isValidImg
 } = require("../validator/validation");
 
 //************************************************ Creating User  ********************************************/
@@ -151,13 +151,28 @@ const createUser = async (req, res) => {
         .send({ status: true, msg: "Please Provide The Address" });
     }
 
+    // if (file && file.length > 0) {
+    //   let url = await aws1.uploadFile(file[0]);
+    //   data["profileImage"] = url;
+    // } else {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, msg: "Please Provide ProfileImage" });
+    // }
+
     if (file && file.length > 0) {
-      let url = await aws1.uploadFile(file[0]);
-      data["profileImage"] = url;
-    } else {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Please Provide ProfileImage" });
+      if (!isValidImg(file[0].mimetype)) {
+          return res
+              .status(400)
+              .send({
+                  status: false,
+                  message: "Image Should be of JPEG/ JPG/ PNG",
+              });
+             
+      }
+      let url = await aws1.uploadFile(file[0])
+            data['productImage'] = url
+
     }
 
     const created = await userModel.create(data);
@@ -248,10 +263,10 @@ const getUser = async (req, res) => {
 
 const updateUserProfile = async function (req,res) {
   try{
-      const userId= req.params.userId;
-      const data= req.body
-      const file = req.files
-      let { fname, lname, phone, email, password, address, profileImage } = data
+    const userId= req.params.userId;
+    const data= req.body
+    const file = req.files
+    let { fname, lname, phone, email, password, address, profileImage } = data
 
       //body is empty
       if (!isValidRequestBody(data)) {
@@ -409,6 +424,15 @@ const updateUserProfile = async function (req,res) {
       //upload file 
       if (file) {
       if (file && file.length > 0) {
+        if (!isValidImg(file[0].mimetype)) {
+          return res
+              .status(400)
+              .send({
+                  status: false,
+                  message: "Image Should be of JPEG/ JPG/ PNG",
+              });
+             
+      }
           let newurl = await aws1.uploadFile(file[0])
           data['profileImage'] = newurl
       }
@@ -417,11 +441,11 @@ const updateUserProfile = async function (req,res) {
           return res.status(200).send({status: true, "message": "User profile updated",data:updateUser})
 
 
-  }
+}
 
-  }catch(err){
-      return res.status(500).send({status:false,msg:err.message})
+}catch(err){
+    return res.status(500).send({status:false,msg:err.message})
 
-  }
+}
 }
 module.exports = { createUser, loginUser, getUser, updateUserProfile };
