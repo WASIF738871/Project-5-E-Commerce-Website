@@ -273,6 +273,8 @@ const updateUserProfile = async function (req,res) {
            // user details (to be updated) sent through request body
             const bodyFromReq = JSON.parse(JSON.stringify(req.body));
       //validation part
+
+      let newObj = {}     
       if (bodyFromReq.hasOwnProperty("fname")) {
           if (!isValid(fname) ) {
               return res.status(400).send({ status: false, msg: "Provide the First Name " })
@@ -280,6 +282,7 @@ const updateUserProfile = async function (req,res) {
           if (!(/^[a-zA-Z ]{2,30}$/.test(fname))) {
               return res.status(400).send({ status: false, msg: "Enter valid  fname" })
           }
+          newObj['fname'] =fname
       }
       if (bodyFromReq.hasOwnProperty("lname")) {
           if ((req.body.lname).trim().length==0) {
@@ -288,6 +291,8 @@ const updateUserProfile = async function (req,res) {
           if (!(/^[a-zA-Z ]{2,30}$/.test(lname))) {
               return res.status(400).send({ status: false, msg: "Enter valid  lname" })
           }
+          newObj['lname'] =lname
+
       }
       if (bodyFromReq.hasOwnProperty("phone")) {
           if (!isValid(phone) || !isValidPhone(phone)) {
@@ -295,7 +300,11 @@ const updateUserProfile = async function (req,res) {
           }
           let PhoneCheck = await userModel.findOne({ phone: phone.trim() })
           if (PhoneCheck) { return res.status(400).send({ status: false, msg: "this phone is already present" }) }
+      
+          newObj['phone'] =phone
+
       }
+
       if (bodyFromReq.hasOwnProperty("email")) {
           if (!isValid(email)) {
               return res.status(400).send({ status: false, msg: "Provide the EmailId " })
@@ -305,6 +314,7 @@ const updateUserProfile = async function (req,res) {
           }
           let checkmail = await userModel.findOne({ email: email })
           if (checkmail) { return res.status(400).send({ status: false, msg: "this email is already present" }) }
+          console.log(checkmail)
       }
       if (bodyFromReq.hasOwnProperty("password")) {
           if (!isValid(password)) {
@@ -321,65 +331,80 @@ const updateUserProfile = async function (req,res) {
           const saltRounds = 10;
           const encryptedPassword = await bcrypt.hash(password, saltRounds)
        
-          var hashpassword=encryptedPassword
+          newObj['password'] = encryptedPassword
+
        }
+
        if (bodyFromReq.hasOwnProperty('address')) {
           if (address) {
               let objAddress = JSON.parse(address)
-              if (objAddress.shipping) {
-                    if(objAddress.shipping.street){
-                        if (!isValid(objAddress.shipping.street)) {
-                            return res.status(400).send({ status: false, Message: "Please provide street name in shipping address" })
-                        }
-                    } 
-                    
-                    if(objAddress.shipping.city){
-                        if (!isValid(objAddress.shipping.city)){
-                            return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
-                        }
-                        if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
-                                return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
-                        }
-                    }   
-                    
-                    if(objAddress.shipping.pincode){
-                        if (!isvalidPincode(objAddress.shipping.pincode)){
-                            return res.status(400).send({ status: false, Message: "Please provide pincode in shipping address" })
-                        }
-                    }  
-                }       
-                
-             
-            if (objAddress.billing) {
+              let add = isUserPresent.address
+                if (objAddress.shipping) {
+                      if(objAddress.shipping.street){
+                          if (!isValid(objAddress.shipping.street)) {
+                              return res.status(400).send({ status: false, Message: "Please provide street name in shipping address" })
+                          }
+                        add.shipping.street= objAddress.shipping.street
+                      } 
+                      
+                      if(objAddress.shipping.city){
+                          if (!isValid(objAddress.shipping.city)){
+                              return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
+                          }
+                          if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
+                                  return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                          }
+                          add.shipping.city = objAddress.shipping.city
 
-                if(objAddress.billing.street){
-                    if (!isValid(objAddress.billing.street)){
-                        return res.status(400).send({ status: false, Message: "Please provide street name in billing address" })
-                    }
-                }      
+                      }   
+                      
+                      if(objAddress.shipping.pincode){
+                          if (!isvalidPincode(objAddress.shipping.pincode)){
+                              return res.status(400).send({ status: false, Message: "Please provide pincode in shipping address" })
+                          }
+                          add.shipping.pincode = objAddress.shipping.pincode
 
-                if(objAddress.billing.city){
-                    if (!isValid(objAddress.billing.city)){
-                        return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
-                    }
-                    if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
-                        return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
-                    }
-                }   
-                
-                if(objAddress.billing.pincode){
-                    if (!isvalidPincode(objAddress.billing.pincode)){
-                        return res.status(400).send({ status: false, Message: "Please provide pincode in billing address" })
-                    }
-               }
-            }
+                      }  
+
+
+                  }      
               
-              var updateaddress = objAddress
-          } else {
-              return res.status(400).send({ status: true, msg: "Please Provide The Address" })
-          }
+              if (objAddress.billing) {
 
-      }
+                  if(objAddress.billing.street){
+                      if (!isValid(objAddress.billing.street)){
+                          return res.status(400).send({ status: false, Message: "Please provide street name in billing address" })
+                      }
+                      add.billing.street = objAddress.billing.street
+
+                  }      
+
+                  if(objAddress.billing.city){
+                      if (!isValid(objAddress.billing.city)){
+                          return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
+                      }
+                      if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
+                          return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                      }
+                      add.billing.city = objAddress.billing.city
+
+                  }   
+                  
+                  if(objAddress.billing.pincode){
+                      if (!isvalidPincode(objAddress.billing.pincode)){
+                          return res.status(400).send({ status: false, Message: "Please provide pincode in billing address" })
+                      }
+                      add.billing.pincode = objAddress.billing.pincode
+
+                  }
+                }
+                  newObj['address'] = add
+
+            } else {
+                  return res.status(400).send({ status: true, msg: "Please Provide The Address" })
+            }
+
+        }
 
       //upload file 
       if (file) {
@@ -387,9 +412,8 @@ const updateUserProfile = async function (req,res) {
           let newurl = await aws1.uploadFile(file[0])
           data['profileImage'] = newurl
       }
-
       //updation part
-          const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { fname: fname, lname: lname, email: email, password: hashpassword, address: updateaddress, profileImage: profileImage,phone:phone } }, { new: true })
+          const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, { $set:newObj}, { new: true })
           return res.status(200).send({status: true, "message": "User profile updated",data:updateUser})
 
 

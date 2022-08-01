@@ -9,7 +9,7 @@ const createProducts = async (req, res) => {
     try {
         let data = req.body
         let file = req.files
-        let { title, description, price, currencyId, currencyFormat,availableSizes,installments } = data
+        let { title, description, price, currencyId, currencyFormat,availableSizes,installments,isFreeShipping} = data
 
         if (!isValidRequestBody(data)) {
             return res.status(400).send({ status: false, msg: "Provide the data for creating product " })
@@ -53,6 +53,13 @@ const createProducts = async (req, res) => {
             return res.status(400).send({ status: false, msg: "currencySymbol should be in ₹" })
         }
 
+        if(isFreeShipping!=null){
+            if (!((isFreeShipping.toLowerCase() === "true") || (isFreeShipping.toLowerCase() === "false"))){
+                return res.status(400).send({ status: false, msg: "please provide boolean value" })
+            }
+            data['isFreeShipping'] = isFreeShipping.toLowerCase()
+        }
+
         // availableSizes = availableSizes.toUpperCase().split(",");
 
         if (file && file.length > 0) {
@@ -63,11 +70,10 @@ const createProducts = async (req, res) => {
             return res.status(400).send({ status: false, msg: "Please Provide ProductImage" })
         }
 
+
         if (availableSizes.length<1) {
             return res.status(400).send({ status: false, msg: "please enter size of product" })
         }
-
-
         sizeArr=availableSizes.replace(/\s+/g, "").split(",").map(String)
         let arr = ["S", "XS","M","X", "L","XXL", "XL"]
         let flag
@@ -78,6 +84,8 @@ const createProducts = async (req, res) => {
             return res.status(400).send({status: false, data: "Enter a valid size S or XS or M or X or L or XXL or XL ",});
            }
         data['availableSizes'] = sizeArr
+
+
 
         if(installments){
             if(!/^[0-9]*$/.test(installments)){
@@ -108,6 +116,7 @@ const getProductByFilter = async function (req, res) {
         let filter = req.body
         let{size,name,priceGreaterThan,priceLessThan} = filter
         let data = {isDeleted:false}
+        
         if(filter.size!=null){
             size = size.replace(/\s+/g, "").toUpperCase().split(",").map(String)
             if(isValid(name)){return res.status(400).send({status:false, msg:"Please Enter Size Value "})}
@@ -117,11 +126,20 @@ const getProductByFilter = async function (req, res) {
             data['title'] = name
         }
         
-        if(priceGreaterThan!=null&& TypeOf(priceGreaterThan)==number){
+        if(priceGreaterThan!=null){
+            if (!/^[0-9]*$/.test(priceGreaterThan)) {
+                return res.status(400).send({ status: false, message: "price should be in numbers" });
+            }
             data['price']= {$gte:priceGreaterThan}
         }
 
         if(priceLessThan!=null){
+            if (!/^[0-9]*$/.test(priceLessThan)) {
+                return res.status(400).send({ status: false, message: "price should be in numbers" });
+            }
+            if (priceLessThan <= 0) {
+                return res.status(400).send({ status: false, msg: "Price can't be zero" })
+            }
             data['price'] = {$lte:priceLessThan}
         }
 
@@ -129,7 +147,7 @@ const getProductByFilter = async function (req, res) {
             data['price'] = {$gte:priceGreaterThan,$lte:priceLessThan}
         }
 
-        const getData = await productModel.find(data).sort({price:1} )
+        const getData = await productModel.find({$contains:{"title":name}}).sort({price:-1} )
         if(getData.length==0){
             return res.status(404).send({status:false,msg:"No Data Found With These Filters"})
             }
@@ -142,7 +160,7 @@ const getProductByFilter = async function (req, res) {
 
 //======================================================getProductById==================================================================================
 const getProductById = async function (req, res) {
-    // try {
+    try {
         const productId = req.params.productId;
 
         if (!isValidObjectId(productId)) {
@@ -153,9 +171,9 @@ const getProductById = async function (req, res) {
             return res.status(404).send({ status: false, message: "No such product exists" })
         }
         res.status(200).send({ status: true, message: 'Success', data: productDetails })
-    // }catch (err) {
-    //     res.status(500).send({ status: false, msg: err.message })   
-    // }
+    }catch (err) {
+        res.status(500).send({ status: false, msg: err.message })   
+    }
 }
 
 //***********************************************Update Product Detatils*********************************************** */
@@ -191,7 +209,7 @@ const updateProduct= async function(req,res){
             return res.status(400).send({ status: false, msg: "Enter a valid title" })
         }
         newObj['title'] = title
-        }   
+        }
         //description
        if(description){ 
         if (!isValid(description)) {
@@ -300,7 +318,7 @@ const deleteProductById = async function (req, res) {
         }
         const findProduct = await productModel.findById(productId);
         if (!findProduct) {
-            return res.status(404).send({ status: false, message: `No book found by ${productId}` })
+            return res.status(404).send({ status: false, message: `No Product found by ${productId}` })
         }
         if (findProduct.isDeleted == true) {
             return res.status(400).send({ status: false, message: `Product has been already deleted.` })
@@ -308,7 +326,7 @@ const deleteProductById = async function (req, res) {
         const deletedProduct = await productModel.findOneAndUpdate({ _id: productId }, { $set: { isDeleted: true, deletedAt: new Date() } }, { new: true }).select({ _id: 1, title: 1, isDeleted: 1, deletedAt: 1 })
         res.status(200).send({ status: true, message: "Product deleted successfullly.", data: deletedProduct })
     }catch (err) {
-        res.status(500).send({ status: false, msg: err.message })   
+        res.status(500).send({ status: false, msg: err.message })
     }
 }
 module.exports = { createProducts, getProductByFilter , getProductById,updateProduct, deleteProductById}
