@@ -171,7 +171,7 @@ const createUser = async (req, res) => {
              
       }
       let url = await aws1.uploadFile(file[0])
-            data['productImage'] = url
+            data['profileImage'] = url
 
     }
 

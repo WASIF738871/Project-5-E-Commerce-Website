@@ -23,7 +23,10 @@ router.delete("/products/:productId",productController.deleteProductById)
 
 //cart Apis
 
-router.post("/users/:userId/cart",cartController.addCart)
+router.post("/users/:userId/cart",middleware.authentication,cartController.addCart)
+router.get("/users/:userId/cart",middleware.authentication,cartController.getCart)
+
+router.delete("/users/:userId/cart",middleware.authentication,cartController.deleteCart)
 
 router.all("/****",function(req,res){                                                   
     return res.status(404).send({status:false,msg:"Check whether the Endpoint is Correct or Not"})
