@@ -1,7 +1,7 @@
 const cartModel = require("../model/cartModel")
 const productModel = require("../model/productModel")
 const userModel = require("../model/userModel")
-const{isValidObjectId} = require('mongoose')
+const { isValidObjectId } = require('mongoose')
 
 const addCart = async function(req,res){
 

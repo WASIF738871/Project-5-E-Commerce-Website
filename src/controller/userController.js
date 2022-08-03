@@ -98,24 +98,24 @@ const createUser = async (req, res) => {
         if (!isValid(objAddress.shipping.street)) {
           return res.status(400).send({
             status: false,
-            Message: "Please provide street name in shipping address",
+            message: "Please provide street name in shipping address",
           });
         }
         if (!isValid(objAddress.shipping.city))
           return res.status(400).send({
             status: false,
-            Message: "Please provide city name in shipping address",
+            message: "Please provide city name in shipping address",
           });
 
         if (!isvalidPincode(objAddress.shipping.pincode))
           return res.status(400).send({
             status: false,
-            Message: "Please provide pincode in shipping address",
+            message: "Please provide pincode in shipping address",
           });
       } else {
         res.status(400).send({
           status: false,
-          Message:
+          message:
             "Please provide shipping address and it should be present in object with all mandatory fields",
         });
       }
@@ -123,24 +123,24 @@ const createUser = async (req, res) => {
         if (!isValid(objAddress.billing.street))
           return res.status(400).send({
             status: false,
-            Message: "Please provide street name in billing address",
+            message: "Please provide street name in billing address",
           });
 
         if (!isValid(objAddress.billing.city))
           return res.status(400).send({
             status: false,
-            Message: "Please provide city name in billing address",
+            message: "Please provide city name in billing address",
           });
 
         if (!isvalidPincode(objAddress.billing.pincode))
           return res.status(400).send({
             status: false,
-            Message: "Please provide pincode in billing address",
+            message: "Please provide pincode in billing address",
           });
       } else {
         return res.status(400).send({
           status: false,
-          Message:
+          message:
             "Please provide billing address and it should be present in object with all mandatory fields",
         });
       }
@@ -162,16 +162,16 @@ const createUser = async (req, res) => {
 
     if (file && file.length > 0) {
       if (!isValidImg(file[0].mimetype)) {
-          return res
-              .status(400)
-              .send({
-                  status: false,
-                  message: "Image Should be of JPEG/ JPG/ PNG",
-              });
-             
+        return res
+          .status(400)
+          .send({
+            status: false,
+            message: "Image Should be of JPEG/ JPG/ PNG",
+          });
+
       }
       let url = await aws1.uploadFile(file[0])
-            data['profileImage'] = url
+      data['profileImage'] = url
 
     }
 
@@ -183,6 +183,10 @@ const createUser = async (req, res) => {
     return res.status(500).send({ status: false, message: err.message });
   }
 };
+
+
+//************************************************ Login User  ********************************************/
+
 
 const loginUser = async function (req, res) {
   try {
@@ -221,7 +225,7 @@ const loginUser = async function (req, res) {
     // Creating Token Here
 
     const token = jwt.sign({ userId: user._id }, "MbFastChe-36", {
-      expiresIn: "24h",
+      expiresIn: "72hr",
     });
 
     let obj = {
@@ -237,6 +241,9 @@ const loginUser = async function (req, res) {
     return res.status(500).send({ status: false, message: err.message });
   }
 };
+
+//************************************************ Get User  ********************************************/
+
 
 const getUser = async (req, res) => {
   try {
@@ -259,14 +266,14 @@ const getUser = async (req, res) => {
   }
 };
 
-//----------------------------------------updateUser----------------------------------------
+//************************************************ update User Profile  ********************************************/
 
 const updateUserProfile = async function (req,res) {
   try{
     const userId= req.params.userId;
     const data= req.body
     const file = req.files
-    let { fname, lname, phone, email, password, address, profileImage } = data
+    let { fname, lname, phone, email, password, address} = data
 
       //body is empty
       if (!isValidRequestBody(data)) {
@@ -315,7 +322,7 @@ const updateUserProfile = async function (req,res) {
           }
           let PhoneCheck = await userModel.findOne({ phone: phone.trim() })
           if (PhoneCheck) { return res.status(400).send({ status: false, message: "this phone is already present" }) }
-      
+
           newObj['phone'] =phone
 
       }
@@ -330,7 +337,7 @@ const updateUserProfile = async function (req,res) {
           let checkmail = await userModel.findOne({ email: email })
           if (checkmail) { return res.status(400).send({ status: false, message: "this email is already present" }) }
           newObj['email'] = email
-      }
+       }
       if (bodyFromReq.hasOwnProperty("password")) {
           if (!isValid(password)) {
               return res.status(400).send({ status: false, message: "Provide the Password " })
@@ -341,11 +348,11 @@ const updateUserProfile = async function (req,res) {
                // if old password is same as new password
             const isSamePassword = bcrypt.compare(password, isUserPresent.password);
             if (isSamePassword) {
-                return res.status(400).send({ status: false, message: "entered password is same as old password" })
+                return res.status(400).send({ status: false, message: "Entered password is same as old password" })
             }
           const saltRounds = 10;
           const encryptedPassword = await bcrypt.hash(password, saltRounds)
-       
+
           newObj['password'] = encryptedPassword
 
        }
@@ -357,14 +364,14 @@ const updateUserProfile = async function (req,res) {
                 if (objAddress.shipping) {
                       if(objAddress.shipping.street){
                           if (!isValid(objAddress.shipping.street)) {
-                              return res.status(400).send({ status: false, Message: "Please provide street name in shipping address" })
+                              return res.status(400).send({ status: false, message: "Please provide street name in shipping address" })
                           }
                         add.shipping.street= objAddress.shipping.street
                       } 
-                      
+
                       if(objAddress.shipping.city){
                           if (!isValid(objAddress.shipping.city)){
-                              return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
+                              return res.status(400).send({ status: false, message: "Please provide city name in shipping address" })
                           }
                           if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
                                   return res.status(400).send({ status: false, message: "Enter valid  city name not a number" })
@@ -372,10 +379,10 @@ const updateUserProfile = async function (req,res) {
                           add.shipping.city = objAddress.shipping.city
 
                       }   
-                      
+
                       if(objAddress.shipping.pincode){
                           if (!isvalidPincode(objAddress.shipping.pincode)){
-                              return res.status(400).send({ status: false, Message: "Please provide pincode in shipping address" })
+                              return res.status(400).send({ status: false, message: "Please provide pincode in shipping address" })
                           }
                           add.shipping.pincode = objAddress.shipping.pincode
 
@@ -383,12 +390,12 @@ const updateUserProfile = async function (req,res) {
 
 
                   }      
-              
+
               if (objAddress.billing) {
 
                   if(objAddress.billing.street){
                       if (!isValid(objAddress.billing.street)){
-                          return res.status(400).send({ status: false, Message: "Please provide street name in billing address" })
+                          return res.status(400).send({ status: false, message: "Please provide street name in billing address" })
                       }
                       add.billing.street = objAddress.billing.street
 
@@ -396,7 +403,7 @@ const updateUserProfile = async function (req,res) {
 
                   if(objAddress.billing.city){
                       if (!isValid(objAddress.billing.city)){
-                          return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
+                          return res.status(400).send({ status: false, message: "Please provide city name in billing address" })
                       }
                       if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
                           return res.status(400).send({ status: false, message: "Enter valid  city name not a number" })
@@ -404,10 +411,10 @@ const updateUserProfile = async function (req,res) {
                       add.billing.city = objAddress.billing.city
 
                   }   
-                  
+
                   if(objAddress.billing.pincode){
                       if (!isvalidPincode(objAddress.billing.pincode)){
-                          return res.status(400).send({ status: false, Message: "Please provide pincode in billing address" })
+                          return res.status(400).send({ status: false, message: "Please provide pincode in billing address" })
                       }
                       add.billing.pincode = objAddress.billing.pincode
 
@@ -436,12 +443,16 @@ const updateUserProfile = async function (req,res) {
           let newurl = await aws1.uploadFile(file[0])
           data['profileImage'] = newurl
       }
+
+      }else{
+        return res.status(400).send({status:false,message:"Provide The Profile Image as u Have selected"})
+      }
       //updation part
           const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, { $set:newObj}, { new: true })
           return res.status(200).send({status: true, "message": "User profile updated",data:updateUser})
 
 
-}
+
 
 }catch(err){
     return res.status(500).send({status:false,message:err.message})

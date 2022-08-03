@@ -66,7 +66,7 @@ const createProducts = async (req, res) => {
                         status: false,
                         message: "Image Should be of JPEG/ JPG/ PNG",
                     });
-                   
+
             }
             let url = await aws1.uploadFile(file[0])
             data['productImage'] = url
@@ -345,7 +345,7 @@ const updateProduct = async function (req, res) {
                             status: false,
                             message: "Image Should be of JPEG/ JPG/ PNG",
                         });
-                       
+
                 }
                 uploadedFileURL = await uploadFile(files[0])
                 newObj['productImage'] = uploadedFileURL
