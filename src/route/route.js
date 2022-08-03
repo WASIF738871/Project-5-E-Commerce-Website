@@ -28,6 +28,8 @@ router.get("/users/:userId/cart",middleware.authentication,cartController.getCar
 
 router.delete("/users/:userId/cart",middleware.authentication,cartController.deleteCart)
 
+router.put("/users/:userId/cart",cartController.updateCart)
+
 router.all("/****",function(req,res){                                                   
     return res.status(404).send({status:false,msg:"Check whether the Endpoint is Correct or Not"})
 })

@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema({
     currencyFormat: {type: String, required:true,trim :true},
     isFreeShipping: {type:Boolean, default: false},
     productImage: {type: String,  required:true},  // s3 link
-    style: {type: String},
+    style: {type: String,trim:true},
     availableSizes:{
         type:[{
             type:String,

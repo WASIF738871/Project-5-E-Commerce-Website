@@ -24,25 +24,25 @@ const createUser = async (req, res) => {
     if (!isValidRequestBody(data)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Provide the data of User " });
+        .send({ status: false, message: "Provide the data of User " });
     }
     //Validating Names
     if (!isValid(fname)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Provide the First Name " });
+        .send({ status: false, message: "Provide the First Name " });
     }
     if (!/^[a-zA-Z ]{2,30}$/.test(fname)) {
-      return res.status(400).send({ status: false, msg: "Enter valid  fname" });
+      return res.status(400).send({ status: false, message: "Enter valid  fname" });
     }
 
     if (!isValid(lname)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Provide the last Name " });
+        .send({ status: false, message: "Provide the last Name " });
     }
     if (!/^[a-zA-Z ]{2,30}$/.test(lname)) {
-      return res.status(400).send({ status: false, msg: "Enter valid  lname" });
+      return res.status(400).send({ status: false, message: "Enter valid  lname" });
     }
 
     if (!isValid(phone) || !isValidPhone(phone)) {
@@ -56,35 +56,35 @@ const createUser = async (req, res) => {
     if (PhoneCheck) {
       return res
         .status(400)
-        .send({ status: false, msg: "this phone is already present" });
+        .send({ status: false, message: "this phone is already present" });
     }
 
     if (!isValid(email)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Provide the EmailId " });
+        .send({ status: false, message: "Provide the EmailId " });
     }
     if (!isValidEmail(email)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Provide the Valid EmailId " });
+        .send({ status: false, message: "Provide the Valid EmailId " });
     }
     let checkmail = await userModel.findOne({ email: email });
     if (checkmail) {
       return res
         .status(400)
-        .send({ status: false, msg: "this email is already present" });
+        .send({ status: false, message: "this email is already present" });
     }
 
     if (!isValid(password)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Provide the Password " });
+        .send({ status: false, message: "Provide the Password " });
     }
     if (!isValidPassword(password)) {
       return res.status(400).send({
         status: false,
-        msg: "Password Length must be btwn 8-15 chars only",
+        message: "Password Length must be btwn 8-15 chars only",
       });
     }
 
@@ -148,7 +148,7 @@ const createUser = async (req, res) => {
     } else {
       return res
         .status(400)
-        .send({ status: true, msg: "Please Provide The Address" });
+        .send({ status: true, message: "Please Provide The Address" });
     }
 
     // if (file && file.length > 0) {
@@ -157,7 +157,7 @@ const createUser = async (req, res) => {
     // } else {
     //   return res
     //     .status(400)
-    //     .send({ status: false, msg: "Please Provide ProfileImage" });
+    //     .send({ status: false, message: "Please Provide ProfileImage" });
     // }
 
     if (file && file.length > 0) {
@@ -178,9 +178,9 @@ const createUser = async (req, res) => {
     const created = await userModel.create(data);
     return res
       .status(201)
-      .send({ status: true, msg: "User Created Succefully", data: created });
+      .send({ status: true, message: "User Created Succefully", data: created });
   } catch (err) {
-    return res.status(500).send({ status: false, msg: err.message });
+    return res.status(500).send({ status: false, message: err.message });
   }
 };
 
@@ -208,7 +208,7 @@ const loginUser = async function (req, res) {
     }
     const user = await userModel.findOne({ email: email });
     if (!user) {
-      return res.status(404).send({ status: false, msg: "Invalid User" });
+      return res.status(404).send({ status: false, message: "Invalid User" });
     }
     const decrypPassword = user.password;
     const pass = bcrypt.compare(password, decrypPassword);
@@ -232,9 +232,9 @@ const loginUser = async function (req, res) {
 
     return res
       .status(201)
-      .send({ status: true, msg: "User LoggedIn Succesfully", data: obj });
+      .send({ status: true, message: "User LoggedIn Succesfully", data: obj });
   } catch (err) {
-    return res.status(500).send({ status: false, msg: err.message });
+    return res.status(500).send({ status: false, message: err.message });
   }
 };
 
@@ -242,20 +242,20 @@ const getUser = async (req, res) => {
   try {
     let userId = req.params.userId;
     if (!userId) {
-      return res.status(400).send({ status: false, msg: "Provide UserID" });
+      return res.status(400).send({ status: false, message: "Provide UserID" });
     }
 
     if (!isValidObjectId(userId)) {
-      return res.status(400).send({ stauts: false, msg: "Invalid User Id" });
+      return res.status(400).send({ stauts: false, message: "Invalid User Id" });
     }
     const data = await userModel.find({ _id: userId });
     if (data) {
       return res.status(200).send({ statu: true, data: data });
     } else {
-      return res.status(404).send({ status: false, msg: "No data Found" });
+      return res.status(404).send({ status: false, message: "No data Found" });
     }
   } catch (err) {
-    return res.status(500).send({ status: false, msg: err.message });
+    return res.status(500).send({ status: false, message: err.message });
   }
 };
 
@@ -274,12 +274,12 @@ const updateUserProfile = async function (req,res) {
       }
       //check userId via mongoose
       if(!isValidObjectId(userId)){
-          return res.status(400).send({stauts:false,msg:"Invalid User Id"})
+          return res.status(400).send({stauts:false,message:"Invalid User Id"})
       }
       //userId present or not
       const isUserPresent =await userModel.findById(userId)
       if(!isUserPresent){
-          return res.status(404).send({status:false,msg:"No User Found"})
+          return res.status(404).send({status:false,message:"No User Found"})
       }
       //authorization
       if (userId != req.userId) {
@@ -292,19 +292,19 @@ const updateUserProfile = async function (req,res) {
       let newObj = {}     
       if (bodyFromReq.hasOwnProperty("fname")) {
           if (!isValid(fname) ) {
-              return res.status(400).send({ status: false, msg: "Provide the First Name " })
+              return res.status(400).send({ status: false, message: "Provide the First Name " })
           }
           if (!(/^[a-zA-Z ]{2,30}$/.test(fname))) {
-              return res.status(400).send({ status: false, msg: "Enter valid  fname" })
+              return res.status(400).send({ status: false, message: "Enter valid  fname" })
           }
           newObj['fname'] =fname
       }
       if (bodyFromReq.hasOwnProperty("lname")) {
           if ((req.body.lname).trim().length==0) {
-              return res.status(400).send({ status: false, msg: "Provide the last Name " })
+              return res.status(400).send({ status: false, message: "Provide the last Name " })
           }
           if (!(/^[a-zA-Z ]{2,30}$/.test(lname))) {
-              return res.status(400).send({ status: false, msg: "Enter valid  lname" })
+              return res.status(400).send({ status: false, message: "Enter valid  lname" })
           }
           newObj['lname'] =lname
 
@@ -314,7 +314,7 @@ const updateUserProfile = async function (req,res) {
               return res.status(400).send({ status: false, message: "phone is required and it should be a valid indian phone number" });
           }
           let PhoneCheck = await userModel.findOne({ phone: phone.trim() })
-          if (PhoneCheck) { return res.status(400).send({ status: false, msg: "this phone is already present" }) }
+          if (PhoneCheck) { return res.status(400).send({ status: false, message: "this phone is already present" }) }
       
           newObj['phone'] =phone
 
@@ -322,21 +322,21 @@ const updateUserProfile = async function (req,res) {
 
       if (bodyFromReq.hasOwnProperty("email")) {
           if (!isValid(email)) {
-              return res.status(400).send({ status: false, msg: "Provide the EmailId " })
+              return res.status(400).send({ status: false, message: "Provide the EmailId " })
           }
           if (!isValidEmail(email)) {
-              return res.status(400).send({ status: false, msg: "Provide the Valid EmailId " })
+              return res.status(400).send({ status: false, message: "Provide the Valid EmailId " })
           }
           let checkmail = await userModel.findOne({ email: email })
-          if (checkmail) { return res.status(400).send({ status: false, msg: "this email is already present" }) }
-          console.log(checkmail)
+          if (checkmail) { return res.status(400).send({ status: false, message: "this email is already present" }) }
+          newObj['email'] = email
       }
       if (bodyFromReq.hasOwnProperty("password")) {
           if (!isValid(password)) {
-              return res.status(400).send({ status: false, msg: "Provide the Password " })
+              return res.status(400).send({ status: false, message: "Provide the Password " })
           }
           if (!isValidPassword(password)) {
-              return res.status(400).send({ status: false, msg: "Password Length must be btwn 8-15 chars only" })
+              return res.status(400).send({ status: false, message: "Password Length must be btwn 8-15 chars only" })
           }
                // if old password is same as new password
             const isSamePassword = bcrypt.compare(password, isUserPresent.password);
@@ -367,7 +367,7 @@ const updateUserProfile = async function (req,res) {
                               return res.status(400).send({ status: false, Message: "Please provide city name in shipping address" })
                           }
                           if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.shipping.city))) {
-                                  return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                                  return res.status(400).send({ status: false, message: "Enter valid  city name not a number" })
                           }
                           add.shipping.city = objAddress.shipping.city
 
@@ -399,7 +399,7 @@ const updateUserProfile = async function (req,res) {
                           return res.status(400).send({ status: false, Message: "Please provide city name in billing address" })
                       }
                       if (!(/^[a-zA-Z ]{2,30}$/.test(objAddress.billing.city))) {
-                          return res.status(400).send({ status: false, msg: "Enter valid  city name not a number" })
+                          return res.status(400).send({ status: false, message: "Enter valid  city name not a number" })
                       }
                       add.billing.city = objAddress.billing.city
 
@@ -416,7 +416,7 @@ const updateUserProfile = async function (req,res) {
                   newObj['address'] = add
 
             } else {
-                  return res.status(400).send({ status: true, msg: "Please Provide The Address" })
+                  return res.status(400).send({ status: true, message: "Please Provide The Address" })
             }
 
         }
@@ -444,7 +444,7 @@ const updateUserProfile = async function (req,res) {
 }
 
 }catch(err){
-    return res.status(500).send({status:false,msg:err.message})
+    return res.status(500).send({status:false,message:err.message})
 
 }
 }
