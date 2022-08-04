@@ -4,6 +4,9 @@ const { uploadFile } = require('../aws/aws')
 const aws1 = require('../aws/aws')
 
 
+//********************************************Crate Product Api************************************************* */
+
+
 
 const createProducts = async (req, res) => {
     try {
@@ -204,7 +207,9 @@ const getProductById = async function (req, res) {
     }
 }
 
+
 //***********************************************Update Product Detatils*********************************************** */
+
 const updateProduct = async function (req, res) {
     try {
         let productId = req.params.productId
@@ -362,7 +367,7 @@ const updateProduct = async function (req, res) {
         res.status(500).send({ status: false, message: err.message })
     }
 }
-//==========================================================================================
+//=============================== Delete Product Api ===================================================================
 const deleteProductById = async function (req, res) {
     try {
         const productId = req.params.productId;

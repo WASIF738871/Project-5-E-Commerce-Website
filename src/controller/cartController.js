@@ -3,6 +3,9 @@ const productModel = require("../model/productModel")
 const userModel = require("../model/userModel")
 const { isValidObjectId } = require('mongoose')
 
+
+//********************************************Crate Cart Api************************************************* */
+
 const addCart = async function(req,res){
 
     try{
@@ -111,6 +114,8 @@ const addCart = async function(req,res){
   }
     
 
+  //******************************************** Get Cart Api************************************************* */
+
 const getCart = async(req,res) =>{
     try{
         let userId = req.params.userId
@@ -140,6 +145,8 @@ const getCart = async(req,res) =>{
     }
 }
 
+//******************************************** Update Cart Api************************************************* */
+
 const updateCart = async(req,res)=>{
     try{    
 
@@ -152,9 +159,9 @@ const updateCart = async(req,res)=>{
             if(!isValidObjectId(userId)){
                 return res.status(400).send({status:false,message:"Invalid UserId"})
             }
-            // if(userId!=req.userId){
-            //     return res.status(403).send({status:false,message:"Unauthorized Access"})
-            // }
+            if(userId!=req.userId){
+                return res.status(403).send({status:false,message:"Unauthorized Access"})
+            }
             let userExist = await userModel.findById(userId)
                 if(!userExist){
                     return res.status(404).send({status:false,message:"No User Found With this Id"})
@@ -214,6 +221,9 @@ const updateCart = async(req,res)=>{
     }
 }
 
+//******************************************** Delete Cart Api************************************************* */
+
+
 const deleteCart = async(req,res)=>{
     try{
             let userId = req.params.userId
@@ -243,6 +253,7 @@ const deleteCart = async(req,res)=>{
         }catch(err){
             return res.status(500).send({status:false,message:err.message})
         }
-
 }
+
+
 module.exports={addCart,getCart,deleteCart,updateCart}
