@@ -12,39 +12,47 @@ const createOrder = async (req, res) => {
         let data = req.body;
         let { cartId } = data;
 
+        //body empty
+        if (Object.keys(data).length == 0) {
+            return res
+                .status(400)
+                .send({ status: false, message: "Provide the data" });
+        }
         //User Validation
         if (!isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, msg: "Invalid UserId" });
+            return res.status(400).send({ status: false, message: "Invalid UserId" });
         }
+        //User Authorization
         if (userId != req.userId) {
             return res
                 .status(403)
                 .send({ status: false, message: "Unauthorized Access" });
         }
+        //User exist or not
         const userExist = await userModel.findById(userId);
         if (!userExist) {
-            return res.status(404).send({ status: false, msg: "No User Found" });
+            return res.status(404).send({ status: false, message: "No User Found" });
         }
 
         data["userId"] = userId;
 
-        //data Checking
-
         //Cart Validation
         if (!data.cartId.trim()) {
-            return res.status(400).send({ status: false, msg: "Provide The CartId" });
+            return res.status(400).send({ status: false, message: "Provide The CartId" });
         }
-
+        //Cart valid or not
         cartId = cartId.trim();
         if (!isValidObjectId(cartId)) {
-            return res.status(400).send({ status: false, msg: "Invalid cartId" });
+            return res.status(400).send({ status: false, message: "Invalid cartId" });
         }
+        //cartId Exist or not
         let cartExist = await cartModel.findById(cartId);
         if (cartExist.items.length == 0) {
             return res
                 .status(404)
-                .send({ status: false, msg: "There Is No Items for Order In Ur Cart" });
+                .send({ status: false, message: "There Is No Items for Order In Ur Cart" });
         }
+
         if (cartExist) {
             data["totalPrice"] = cartExist.totalPrice;
             data["totalItems"] = cartExist.totalItems;
@@ -53,7 +61,7 @@ const createOrder = async (req, res) => {
               
                 totalQuantity += cartExist.items[i].quantity;
             }
-            
+
             data["items"] = cartExist.items
             data["totalQuantity"] = totalQuantity;
 
@@ -68,14 +76,14 @@ const createOrder = async (req, res) => {
                 .status(201)
                 .send({
                     status: true,
-                    msg: "Order Created SuccessFull",
+                    message: "Order Created SuccessFull",
                     Order: orderCreated,
                 });
         } else {
-            return res.status(404).send({ status: false, msg: "No Cart Found" });
+            return res.status(404).send({ status: false, message: "No Cart Found" });
         }
     } catch (err) {
-        return res.status(500).send({ status: false, msg: err.message });
+        return res.status(500).send({ status: false, message: err.message });
     }
 };
 
@@ -87,24 +95,27 @@ const updateOrder = async (req, res) => {
         let data = req.body;
         let { orderId,status } = data;
 
+        //body empty
+        if (Object.keys(data).length == 0) {
+            return res
+                .status(400)
+                .send({ status: false, message: "Provide The Data" });
+        }
+
         //User Validation
         if (!isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, msg: "Invalid UserId" });
+            return res.status(400).send({ status: false, message: "Invalid UserId" });
         }
+        //user Authorization
         if (userId != req.userId) {
             return res
                 .status(403)
                 .send({ status: false, message: "Unauthorized Access" });
         }
+        //user exist or not
         const userExist = await userModel.findById(userId);
         if (!userExist) {
-            return res.status(404).send({ status: false, msg: "No User Found" });
-        }
-
-        if (Object.keys(data).length == 0) {
-            return res
-                .status(400)
-                .send({ status: false, message: "Provide The data " });
+            return res.status(404).send({ status: false, message: "No User Found" });
         }
 
         //order validation
@@ -112,11 +123,13 @@ const updateOrder = async (req, res) => {
         if (!orderId) {
             return res
                 .status(400)
-                .send({ status: false, msg: "Provide The OrderId" });
+                .send({ status: false, message: "Provide The OrderId" });
         }
+        //orderId valid or not
         if (!isValidObjectId(orderId)) {
-            return res.status(400).send({ status: false, msg: "Invalid OrderId" });
+            return res.status(400).send({ status: false, message: "Invalid OrderId" });
         }
+        //orderId Exist or not
         let orderExist = await orderModel.findOne({
             _id: orderId,
             isDeleted: false,
@@ -124,23 +137,46 @@ const updateOrder = async (req, res) => {
         if (!orderExist) {
             return res
                 .status(404)
-                .send({ status: false, msg: "There Is no order Exist" });
+                .send({ status: false, message: "There Is no order Exist" });
         }
+        //userId checking from OrderId
         if (orderExist.userId != userId) {
             return res
                 .status(403)
                 .send({
                     status: false,
-                    msg: "Either this OrderId or userId is not Urs",
+                    message: "Either this OrderId or userId is not Urs",
                 });
         }
-        if (orderExist.cancellable == "false") {
+
+        //status validation
+        if (!status) {
             return res
                 .status(400)
-                .send({ status: false, msg: "This Order Can't be cancelled" });
+                .send({ status: false, message: "Provide The Status" });
+        }
+        availableStatus = status.replace(/\s+/g, "").split(",").map(String);
+        let arr = ["completed", "canceled"];
+        let flag;
+        for (let i = 0; i < availableStatus.length; i++) {
+            flag = arr.includes(availableStatus[i]);
+        }
+        if (!flag) {
+            return res.status(400).send({
+                status: false,
+                data: "Enter a valid Status: completed or canceled",
+            });
+        }
+        data["status"] = availableStatus;
+
+
+        if (orderExist.cancellable == false) {
+            return res
+                .status(400)
+                .send({ status: false, message: "This Order Can't be cancelled" });
         } else {
             orderExist.status = status;
-            // orderExist.isDeleted = true;
+            // orderExist.isDeleted = true; //no requirement in our project
             // orderExist.deletedAt = Date.now();
             let updated = await orderModel.findOneAndUpdate(
                 { _id: orderId },
@@ -149,10 +185,10 @@ const updateOrder = async (req, res) => {
             );
             return res
                 .status(200)
-                .send({ status:true, msg: "order Updated", Order: updated });
+                .send({ status:true, message: "order Updated", Order: updated });
         }
     } catch (err) {
-        return res.status(500).send({ status: flase, msg: err.message });
+        return res.status(500).send({ status: flase, message: err.message });
     }
 };
 
