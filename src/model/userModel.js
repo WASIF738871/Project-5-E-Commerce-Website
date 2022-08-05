@@ -5,47 +5,47 @@ const userSchema = new mongoose.Schema({
     fname: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
     lname: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
 
     phone: {
         type: String,
         required: true,
         unique: true,
-        trim:true
+        trim: true
     },
     email: {
         require: true,
         type: String,
         unique: true,
-        trim:true
+        trim: true
     },
     password: {
         require: true,
         type: String,
-        trim:true
+        trim: true
     },
     profileImage: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
     address: {
         shipping: {
-            street: { type: String,required:true,trim:true },
-            city: { type: String,required:true,trim:true },
-            pincode: { type: String,required:true,trim:true }
+            street: { type: String, required: true, trim: true },
+            city: { type: String, required: true, trim: true },
+            pincode: { type: String, required: true, trim: true }
         }
         ,
         billing: {
-            street: { type: String,required:true,trim:true },
-            city: { type: String,required:true,trim:true },
-            pincode: { type: String,required:true,trim:true }
+            street: { type: String, required: true, trim: true },
+            city: { type: String, required: true, trim: true },
+            pincode: { type: String, required: true, trim: true }
         }
     }
 

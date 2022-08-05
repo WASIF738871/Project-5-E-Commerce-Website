@@ -4,11 +4,11 @@ const route = require("../src/route/route");
 const mongoose = require("mongoose");
 const aws = require("aws-sdk")
 const multer = require("multer")
-const app = express(); 
+const app = express();
 
 app.use(bodyParser.json());
 app.use(multer().any())
-app.use(bodyParser.urlencoded({extended:true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 
 
