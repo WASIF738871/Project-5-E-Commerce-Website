@@ -4,7 +4,7 @@ const authentication = async function (req, res, next) {
         let tokenWithBearer = req.headers["authorization"];
         // console.log(tokenWithBearer);
         if (!tokenWithBearer) {
-            return res.status(400).send({ status: false, msg: "token not found" });
+            return res.status(401).send({ status: false, msg: "token not found" });
         }
         let tokenArray = tokenWithBearer.split(" ");
         // console.log(tokenArray);

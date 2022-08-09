@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-//request body validation (required: true)
+//request body validation 
 const isValidRequestBody = function (reqbody) {
     if (!Object.keys(reqbody).length) {
         return false;
@@ -8,7 +8,12 @@ const isValidRequestBody = function (reqbody) {
     return true;
 };
 
-// string validation (required: true)
+//objectId body validation 
+const isValidObjectId = function (objectId) {
+    return mongoose.Types.ObjectId.isValid(objectId); // returns a boolean
+};
+
+// checking validation for undefined, null and string
 const isValid = function (value) {
     if (typeof value === "undefined" || typeof value === null) return false;
     if (typeof value === "string" && value.trim().length == 0) return false;
@@ -20,26 +25,29 @@ const isValidEmail = function (email) {
     const pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return pattern.test(email); // returns a boolean
 };
-const isvalidPincode = (value) => ({}.toString.call(value) == '[object Number]') ? true : false //{}.toString.call(value) == '[object Number]'
+
+// pinCode validation
+const isvalidPincode = (value) => ({}.toString.call(value) == '[object Number]') ? true : false
+
+// password validation
 const isValidPassword = function (password) {
     if (password.length >= 8 && password.length <= 15) {
         return true;
     }
     return false;
 };
+
+// phone validation
 const isValidPhone = function (phone) {
     const pattern = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/;
     return pattern.test(phone); // returns a boolean
 };
-const isValidObjectId = function (objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId); // returns a boolean
-};
 
+// image validation
 const isValidImg = (img) => {
     const reg = /image\/png|image\/jpeg|image\/jpg/;
     return reg.test(img)
 }
 
 
-
-module.exports = { isValidRequestBody, isValidEmail, isValid, isvalidPincode, isValidPassword, isValidPhone, isValidObjectId,isValidImg }
+module.exports = { isValidRequestBody, isValidEmail, isValid, isvalidPincode, isValidPassword, isValidPhone, isValidObjectId, isValidImg }
