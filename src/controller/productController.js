@@ -53,8 +53,7 @@ const createProducts = async (req, res) => {
         }
 
         if (isFreeShipping != null) {
-            if (!(isFreeShipping.toLowerCase() === "true" || isFreeShipping.toLowerCase() === "false")
-            ) {
+            if (!(isFreeShipping.toLowerCase() === "true" || isFreeShipping.toLowerCase() === "false")) {
                 return res.status(400).send({ status: false, message: "please provide boolean value" });
             }
 
@@ -97,6 +96,7 @@ const createProducts = async (req, res) => {
                 return res.status(400).send({ status: false, message: "installments Shoud be In Valid  Number only" });
             }
         }
+
         //style
         if (style != null) {
             if (!isValid(style)) {
@@ -133,7 +133,8 @@ const getProductByFilter = async function (req, res) {
         }
         if (name != null) {
             if (name.trim().length > 0) {
-                data["title"] = name;   //pending regex for fetching entire product by piece of string
+                data["title"] = { $regex: name , $options: "$i" };   //pending regex for fetching entire product by piece of string
+            console.log(data.title)
             } else {
                 return res.status(400).send({ status: false, message: "Provide The name as u have selected" });
             }
@@ -207,7 +208,7 @@ const getProductById = async function (req, res) {
             return res.status(400).send({ status: false, message: "Please provide valid productId" });
         }
 
-        let productDetails = await productModel.findOne({ _id: productId, isDeleted: false });
+        let productDetails = await productModel.findById({ _id: productId, isDeleted: false });
         if (!productDetails) {
             return res.status(404).send({ status: false, message: "No such product exists" });
         }
@@ -363,7 +364,6 @@ const updateProduct = async function (req, res) {
 
         let uploadedFileURL;
         if (files) {
-            console.log(files)
             if (files == null) {
                 return res.status(400).send({ status: false, message: "Provide the Product Image as u have selected" });
             }
@@ -401,9 +401,7 @@ const deleteProductById = async function (req, res) {
             return res.status(404).send({ status: false, message: `No product found by ${productId}` }); ///product
         }
         if (findProduct.isDeleted == true) {
-            return res
-                .status(400)
-                .send({ status: false, message: `Product has been already deleted.` });
+            return res.status(400).send({ status: false, message: `Product has been already deleted.` });
         }
 
         let deletedProduct = await productModel.findByIdAndUpdate({ _id: productId },{ $set: { isDeleted: true, deletedAt: new Date() } },{ new: true }).select({ _id: 1, title: 1, isDeleted: 1, deletedAt: 1 });
@@ -413,6 +411,7 @@ const deleteProductById = async function (req, res) {
         res.status(500).send({ status: false, message: err.message });
     }
 };
+
 module.exports = {
     createProducts,
     getProductByFilter,

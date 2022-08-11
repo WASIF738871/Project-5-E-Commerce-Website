@@ -10,10 +10,8 @@ const productSchema = new mongoose.Schema({
     productImage: { type: String, required: true },  // s3 link
     style: { type: String, trim: true },
     availableSizes: {
-        type: [{
-            type: String,
-            // enum:["S", "XS","M","X", "L","XXL", "XL"]
-        }]
+        type: [String],
+        enum: ["S", "XS", "M", "X", "L", "XXL", "XL"]
     },
 
     installments: { type: Number, trim: true },

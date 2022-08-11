@@ -11,7 +11,7 @@ app.use("/", route);
 
 
 
-mongoose.connect("mongodb+srv://WASIF321:Ansari738871@wasifdatabase.wdcjr.mongodb.net/group36Database",
+mongoose.connect("mongodb+srv://WASIF321:Ansari738871@wasifdatabase.wdcjr.mongodb.net/productManagement-DB",
     { useNewUrlParser: true }).then(() => console.log("MongoDb is connected")).catch((err) => console.log(err));
 
 

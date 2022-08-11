@@ -3,6 +3,7 @@ const productModel = require("../model/productModel");
 const cartModel = require("../model/cartModel");
 const userModel = require("../model/userModel");
 const { isValidObjectId } = require("mongoose");
+const{isValidRequestBody} = require("../validator/validation")
 
 //********************************************Crate Order Api************************************************* */
 
@@ -153,11 +154,7 @@ const updateOrder = async (req, res) => {
             return res.status(400).send({ status: false, message: "This Order Can't be cancelled" });
         } else {
             orderExist.status = status;
-            let updated = await orderModel.findOneAndUpdate(
-                { _id: orderId },
-                { $set: orderExist },
-                { new: true }
-            );
+            let updated = await orderModel.findOneAndUpdate({ _id: orderId },{ $set: orderExist },{ new: true });
             return res.status(200).send({ status: true, message: "order Updated", Order: updated });
         }
     } catch (err) {

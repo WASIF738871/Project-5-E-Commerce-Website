@@ -63,6 +63,7 @@ const createUser = async (req, res) => {
 
     if (address) {
       let objAddress = JSON.parse(address);
+
       if (objAddress.shipping) {
         if (!isValid(objAddress.shipping.street)) {
           return res.status(400).send({ status: false, message: "Please provide street name in shipping address" });
@@ -75,6 +76,7 @@ const createUser = async (req, res) => {
       } else {
         res.status(400).send({ status: false, message: "Please provide shipping address and it should be present in object with all mandatory fields" });
       }
+
       if (objAddress.billing) {
         if (!isValid(objAddress.billing.street))
           return res.status(400).send({ status: false, message: "Please provide street name in billing address" });
@@ -87,7 +89,9 @@ const createUser = async (req, res) => {
       } else {
         return res.status(400).send({ status: false, message: "Please provide billing address and it should be present in object with all mandatory fields" });
       }
+
       data["address"] = objAddress;
+
     } else {
       return res.status(400).send({ status: true, message: "Please Provide The Address" });
     }
@@ -99,12 +103,13 @@ const createUser = async (req, res) => {
       if (!isValidImg(file[0].mimetype)) {
         return res.status(400).send({ status: false, message: "Image Should be of JPEG/ JPG/ PNG" });
       }
+
       let newurl = await aws1.uploadFile(file[0]);
       data["profileImage"] = newurl;
     }
 
 
-    const createdUser = await userModel.create(data);
+    let createdUser = await userModel.create(data);
     return res.status(201).send({ status: true, message: "User Created Succefully", data: createdUser });
 
   } catch (err) {
@@ -140,7 +145,6 @@ const loginUser = async function (req, res) {
     }
 
     // Creating Token Here
-
     const token = jwt.sign(
       { userId: emailCheck._id },
       "MbFastChe-36",
