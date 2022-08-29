@@ -12,7 +12,7 @@ const authentication = async function (req, res, next) {
 
         let decodedtoken = jwt.verify(token, "MbFastChe-36", function (err, token) {
             if (err) return false;
-            if (token) return true
+            if (token) return token;
         });
         if (!decodedtoken) {
             return res.status(401).send({ status: false, msg: "invalid token" });
